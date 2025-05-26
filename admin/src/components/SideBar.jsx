@@ -2,11 +2,13 @@ import React, { useContext } from 'react'
 import { AdminContext } from '../context/AdminContext'
 import { NavLink } from 'react-router-dom';
 import { assets } from '../assets/assets';
+import { DoctorContext } from '../context/DoctorContext';
 
 const SideBar = () => {
 
     //grab the token
     const { aToken } = useContext(AdminContext);
+    const {dToken} = useContext(DoctorContext);
 
     //if token available then show all options
     return (
@@ -20,6 +22,14 @@ const SideBar = () => {
                     <NavItem to={'/doctor-list'} icon={assets.people_icon} label="Doctors List" />
                 </ul>
             }
+            {
+                //assign all navigations
+                dToken && <ul className='text-gray-700 mt-5'>
+                    <NavItem to={'/doctor-dashboard'} icon={assets.home_icon} label="Dashboard" />
+                    <NavItem to={'/doctor-appointments'} icon={assets.appointment_icon} label="Appointments" />
+                    <NavItem to={'/doctor-profile'} icon={assets.people_icon} label="Profile" />
+                </ul>
+            }
         </div>
     )
 }
@@ -28,7 +38,7 @@ const NavItem = ({ to, icon, label }) => {
     return (
         <NavLink className={({ isActive }) => `flex items-center gap-3 py-3.5 px-3 md:px-9 md:min-w-72 cursor-pointer rounded-lg transition-all duration-300 ${isActive ? 'bg-indigo-200 text-indigo-800 border-r-4 border-indigo-600' : 'hover:bg-indigo-100 hover:text-indigo-700'}`} to={to}>
             <img className='w-6 h-6' src={icon} alt="" />
-            <p>{label}</p>
+            <p className='hidden md:block'>{label}</p>
         </NavLink>
     )
 }

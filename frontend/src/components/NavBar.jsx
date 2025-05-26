@@ -1,16 +1,18 @@
-import React, { useState } from "react";
+import React, { useContext, useState } from "react";
 import { assets } from "../assets/assets";
 import { NavLink, useNavigate } from "react-router-dom";
+import { AppContext } from "../context/AppContext";
 
-//creating our nav bar
 const NavBar = () => {
-  //navigate to login / create acoount section by click the button
   const navigate = useNavigate();
-
-  //after login showing the profile picture & dropdown menu
   const [showMenu, setShowMenu] = useState(false);
-  //token = true -> logged in, token = false -> logged out
-  const [token, setToken] = useState(true);
+  const { token, setToken, userData } = useContext(AppContext);
+
+  const logout = () => {
+    setToken(false);
+    localStorage.removeItem("token");
+  };
+  
   return (
     <div className="flex items-center justify-between text-sm py-4 mb-5 border-b border-b-gray-400 bg-white shadow-md">
       <img onClick={()=>navigate('/')} className="w-44 cursor-pointer" src={assets.logo} alt="" />
@@ -34,15 +36,15 @@ const NavBar = () => {
       </ul>
       <div className="flex items-center gap-4">
         {//if logged in then show profile else button
-        token ? (
+        token && userData ? (
           <div className="flex items-center gap-2 cursor-pointer group relative">
-            <img className="w-8 rounded-full" src={assets.profile_pic} alt="" />
+            <img className="w-8 rounded-full" src={userData.image} alt="" />
             <img className="w-2.5" src={assets.dropdown_icon} alt="" />
             <div className="absolute top-0 right-0 pt-14 text-base font-medium text-gray-600 z-20 hidden group-hover:block">
                 <div className="min-w-48 bg-stone-100 rounded-lg shadow-lg flex flex-col gap-4 p-4">
                     <p onClick={()=>navigate('my-profile')} className="hover:text-black cursor-pointer">My Profile</p>
                     <p onClick={()=>navigate('my-appointments')} className="hover:text-black cursor-pointer">My Appointments</p>
-                    <p onClick={()=>setToken(false)} className="hover:text-black cursor-pointer">Logout</p>
+                    <p onClick={logout} className="hover:text-black cursor-pointer">Logout</p>
                 </div>
             </div>
           </div>
