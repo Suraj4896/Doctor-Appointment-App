@@ -1,52 +1,130 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
+import { useContext } from 'react';
+import { AppContext } from '../context/AppContext';
+import axios from 'axios';
+import { toast } from 'react-toastify';
+import { useNavigate } from 'react-router-dom';
 
 const Login = () => {
-  //state for sign up
+  const { backendUrl, token, setToken } = useContext(AppContext);
+  const navigate = useNavigate();
   const [state, setState] = useState('Sign Up');
-  //state for email
   const [email, setEmail] = useState('');
-  //state for password
   const [password, setPassword] = useState('');
-  //state for name
   const [name, setName] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
 
-  //function to handle sign up
-  const onSubmitHandler = async (event) =>{
-    //prevent default form submission
-      event.preventDefault();
+  //logic for submit
+  const onSubmitHandler = async (event) => {
+    event.preventDefault();
+    setIsLoading(true);
+    
+    try {
+      const endpoint = state === 'Sign Up' ? '/register' : '/login';
+      const payload = state === 'Sign Up' ? { name, password, email } : { password, email };
+      
+      const { data } = await axios.post(backendUrl + '/api/user' + endpoint, payload);
+      if (data.success) {
+        localStorage.setItem('token', data.token);
+        setToken(data.token);
+        toast.success(`Welcome ${state === 'Sign Up' ? name : 'back'}!`);
+      } else {
+        toast.error(data.message);
+      }
+    } catch (error) {
+      toast.error(error.response?.data?.message || error.message);
+    } finally {
+      setIsLoading(false);
+    }
   }
+
+  //if token is present then show the home page
+  useEffect(() => {
+    if (token) navigate('/');
+  }, [token])
+
   return (
-    // according to the state we will switch between sign up and login
-    <form className='min-h-[80vh] flex items-center'>
-      <div className='flex flex-col gap-3 m-auto items-start p-8 min-w-[340px] sm:min-w-96 border rounded-xl text-zinc-600 text-sm shadow-lg'>
-        <p className='text-2xl font-semibold'>{state === 'Sign Up' ? "Create Account" : "Login"}</p>
-        <p>Please {state === 'Sign Up' ? "sign up" : "log in"} to book appointment</p>
-        {
-          //show the name input field when state is sign up
-          state === 'Sign Up' && (
-            <div className='w-full'>
-              <p>Full Name</p>
-              <input className='border border-zinc-300 rounded w-full p-2 mt-1' type="text" onChange={(e)=>setName(e.target.name)} value={name} required />
+    <div className="min-h-screen flex items-center p-4">
+      <form onSubmit={onSubmitHandler} className="w-full max-w-md px-4 mx-auto">
+        <div className="bg-white rounded-xl p-8 shadow-[0_8px_30px_rgb(0,0,0,0.12)] ring-1 ring-gray-200 transition-all duration-300 hover:shadow-[0_8px_40px_rgb(0,0,0,0.15)] hover:ring-gray-300">
+          <div className="flex flex-col space-y-6">
+            <div className="text-center">
+              <h2 className="text-3xl font-bold text-gray-900 mb-2">
+                {state === 'Sign Up' ? "Create Account" : "Welcome Back"}
+              </h2>
+              <p className="text-gray-500">
+                {state === 'Sign Up' 
+                  ? "Start your journey with us" 
+                  : "Continue to book your appointment"}
+              </p>
             </div>
-          )
-        }
-        
-        <div className='w-full'>
-          <p>Email</p>
-          <input className='border border-zinc-300 rounded w-full p-2 mt-1' type="email" onChange={(e)=>setEmail(e.target.name)} value={email} required />
+
+            {state === 'Sign Up' && (
+              <div className="space-y-1">
+                <label className="text-sm font-medium text-gray-700">Full Name</label>
+                <input
+                  type="text"
+                  placeholder="John Doe"
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
+                  className="w-full px-4 py-3 rounded-lg border border-gray-200 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 transition-colors outline-none"
+                  required
+                />
+              </div>
+            )}
+
+            <div className="space-y-1">
+              <label className="text-sm font-medium text-gray-700">Email</label>
+              <input
+                type="email"
+                placeholder="john@example.com"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                className="w-full px-4 py-3 rounded-lg border border-gray-200 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 transition-colors outline-none"
+                required
+              />
+            </div>
+
+            <div className="space-y-1">
+              <label className="text-sm font-medium text-gray-700">Password</label>
+              <input
+                type="password"
+                placeholder="••••••••"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                className="w-full px-4 py-3 rounded-lg border border-gray-200 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 transition-colors outline-none"
+                required
+              />
+            </div>
+
+            <button
+              type="submit"
+              disabled={isLoading}
+              className="w-full bg-indigo-600 hover:bg-indigo-700 text-white py-3 px-4 rounded-lg font-medium transition-colors duration-300 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center"
+            >
+              {isLoading ? (
+                <div className="h-5 w-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
+              ) : (
+                state === 'Sign Up' ? "Create Account" : "Sign In"
+              )}
+            </button>
+
+            <p className="text-center text-gray-600">
+              {state === 'Sign Up' 
+                ? "Already have an account? "
+                : "Don't have an account? "}
+              <button
+                type="button"
+                onClick={() => setState(prev => prev === 'Sign Up' ? 'Login' : 'Sign Up')}
+                className="text-indigo-600 hover:text-indigo-800 font-medium transition-colors"
+              >
+                {state === 'Sign Up' ? "Sign In" : "Create Account"}
+              </button>
+            </p>
+          </div>
         </div>
-        <div className='w-full'>
-          <p>Password</p>
-          <input className='border border-zinc-300 rounded w-full p-2 mt-1' type="password" onChange={(e)=>setPassword(e.target.name)} value={password} required />
-        </div>
-        <button className='bg-primary text-white w-full py-2 rounded-md text-base shadow-lg'>{state === 'Sign Up' ? "Create Account" : "Login"}</button>
-        {
-          state === 'Sign Up'
-           ? <p>Already have an account? <span onClick={()=>setState('Login')} className='text-primary underline cursor-pointer'>Login here</span></p>
-           : <p>Create a new account? <span onClick={()=>setState('Sign Up')} className='text-primary underline cursor-pointer'>Click here</span></p>
-        }
-      </div>
-    </form>
+      </form>
+    </div>
   )
 }
 
