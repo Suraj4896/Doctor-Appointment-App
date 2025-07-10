@@ -44,7 +44,7 @@ React, Express, MongoDB, JWT, Cloudinary, Tailwind CSS
 ## Setup Instructions
 ```bash
 git clone https://github.com/your-username/DocBook.git
-cd DocBook
+cd Prescripto
 npm install
 npm start
 
