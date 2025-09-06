@@ -221,7 +221,7 @@ const MyProfile = () => {
               {isEdit ? (
                 <select
                   className="w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-200 appearance-none bg-no-repeat bg-right-4 pr-10"
-                  style={{ backgroundImage: `url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23343a40'%3e%3cpath d='M7 10l5 5 5-5z'/%3e%3c/svg%3e")` }}
+                  // style={{ backgroundImage: `url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23343a40'%3e%3cpath d='M7 10l5 5 5-5z'/%3e%3c/svg%3e")` }}
                   value={userData.gender}
                   onChange={(e) => setUserData((prev) => ({ ...prev, gender: e.target.value }))}
                 >
