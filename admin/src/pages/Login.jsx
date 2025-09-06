@@ -22,7 +22,7 @@ const Login = () => {
         //api call for admin and doctor
         try {
             if(state == 'Admin'){
-                //fetch the admin email and password from backend using axios
+                //fetch the admin token from backend using axios
                 const {data} = await axios.post(backendUrl + '/api/admin/login', {email, password});
                 if(data.success){
                     //store it to local storage
